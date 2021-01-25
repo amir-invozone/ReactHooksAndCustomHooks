@@ -1,69 +1,69 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-// const useDocumentTitle = title => {
-//     useEffect(() => {
-//         document.title = title;
-//     });
-// }
-
-// function App () {
-//     const [count, setCount] = useState(0);
-//     const increment = () => setCount(count + 1);
-//     const title = `You clicked ${count} times`;
-//     useDocumentTitle(title);
-//     var myStyle = {
-//         padding: 10,
-//         backgroundColor: 'green',
-//         color: 'white',
-//         borderRadius: 5
-//     }
-//     return (
-//         <div>
-//             <p>You clicked {count} times</p>
-//             <button onClick={increment}>
-//                 Click me
-//       </button>
-//         </div>
-//     );
-// }
-
-const useValueChanged=(myData) => {
-    useEffect(() => {
-        const lenght = myData.match('.{8,}');
-        const upperCase = myData.match('(?=.*?[A-Z])');
-        const lowerCase = myData.match('(?=.*?[a-z])');
-        const speacialCharacter = myData.match('(?=.*?[#?!@$%^&*-])');
-        const number = myData.match('(?=.*?[0-9])');
-        document.getElementById('lenght').style.color = lenght ? 'green' : 'red';
-        document.getElementById('upperCase').style.color = upperCase ? 'green' : 'red';
-        document.getElementById('lowerCase').style.color = lowerCase ? 'green' : 'red';
-        document.getElementById('speacialCharacter').style.color = speacialCharacter ? 'green' : 'red';
-        document.getElementById('number').style.color = number ? 'green' : 'red';
-    });
-}
-
-function Form () {
-    const [data, setValue] = useState('');
-    useValueChanged(data);
-    const myStyle = {
-        padding: 5,
-        borderRadius: 5
+const useValueChanged = (
+  myData,
+  lengthRef,
+  upperCaseRef,
+  lowerCaseRef,
+  speacialCharacterRef,
+  numberRef,
+) => {
+  const [isInitialMount, setisInitialMount] = useState(true);
+  // const isInitialMount = useRef(true);
+  useEffect(() => {
+    // if (isInitialMount.current) {
+    //     isInitialMount.current = false;
+    // }
+    if (isInitialMount) {
+      setisInitialMount(false);
+    } else {
+      lengthRef.current.style.color = myData.match('.{8,}') ? 'green' : 'red';
+      upperCaseRef.current.style.color = myData.match('(?=.*?[A-Z])') ? 'green' : 'red';
+      lowerCaseRef.current.style.color = myData.match('(?=.*?[a-z])') ? 'green' : 'red';
+      speacialCharacterRef.current.style.color = myData.match('(?=.*?[#?!@$%^&*-])')
+        ? 'green'
+        : 'red';
+      numberRef.current.style.color = myData.match('(?=.*?[0-9])') ? 'green' : 'red';
+      console.log('Updated');
     }
-    return (
-        <div>
-            <label>Password: </label>
-            <input style={myStyle} type="text" placeholder="Please enter your passord"
-             value={data} onChange={(val) => { setValue(val.target.value) }} />
-            <p>Password must contain: </p>
-            <ul>
-                <li id="lenght">Minimum eight characters in length</li>
-                <li id="upperCase">At least one upper case letter</li>
-                <li id="lowerCase">At least one lower case letter</li>
-                <li id="speacialCharacter">At least one special character, #?!@$%^&*-</li>
-                <li id="number">At least one digit</li>
-            </ul>
-        </div>
-    );
+  }, [myData]);
+};
+
+function Form() {
+  const [data, setValue] = useState('');
+  const lengthRef = useRef();
+  const upperCaseRef = useRef();
+  const lowerCaseRef = useRef();
+  const speacialCharacterRef = useRef();
+  const numberRef = useRef();
+  useValueChanged(data, lengthRef, upperCaseRef, lowerCaseRef, speacialCharacterRef, numberRef);
+  const myStyle = {
+    padding: 5,
+    borderRadius: 5,
+  };
+  return (
+    <div>
+      <label htmlFor="password">Password: </label>
+      <input
+        style={myStyle}
+        type="text"
+        id="password"
+        placeholder="Please enter your password"
+        value={data}
+        onChange={(val) => {
+          setValue(val.target.value);
+        }}
+      />
+      <p>Password must contain: </p>
+      <ul>
+        <li ref={lengthRef}>Minimum eight characters in length</li>
+        <li ref={upperCaseRef}>At least one upper case letter</li>
+        <li ref={lowerCaseRef}>At least one lower case letter</li>
+        <li ref={speacialCharacterRef}>At least one special character, #?!@$%^&*-</li>
+        <li ref={numberRef}>At least one digit</li>
+      </ul>
+    </div>
+  );
 }
 
 export default Form;
